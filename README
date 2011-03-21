@@ -1,0 +1,12 @@
+This is an ASCII game engine I made during my freshman year. A nice way to learn
+how to deal with those crazy function pointers. That and dynamic libraries.
+
+Comments in portuguese, since it was intended for my classmates, and I wouldn't
+translate it now without completely rewriting and fixing the code.
+
+Without ncurses, of course, because libs are for wimps! And so are makefiles!
+
+Old and weird stuff, but you might like something.
+
+I recently used that FPS bit for an assignment.
+(yes, I used both ncurses and a makefile there...)

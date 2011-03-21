@@ -1,0 +1,10 @@
+todo:
+-implementar a entrada de teclas no linux
+-implementar um sistema de entrada de várias teclas ao mesmo tempo
+-implementar animações
+-traduzir tudo para inglês(?)
+
+bugs:
+-Quando mais de um sprite é lido de um txt, o programa trava. Entretanto,
+ele funciona normalmente no gdb, o que dificulta a identificação do problema
+(acho que é um problema do windows/mingw, pq não acontece no linux)

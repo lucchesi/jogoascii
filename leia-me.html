@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+
+
+
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Jogo em ASCII - Documentação</title></head><body>
+<span style="font-weight: bold;">
+Engine de jogos em ASCII, feita na linguagem C</span><span style="font-weight: bold;"><br>
+<br>
+</span>
+
+
+<br>
+
+A engine foi feita para se estudar as diversas partes que
+compõem um jogo de computador. Embora seja muito simples, a
+lógica de funcionamento do projeto é semelhante à
+dos
+jogos e engines "reais", servindo assim para o aprendizado de tais
+técnicas utilizando ferramentas familiares aos
+recém-ingressados a um curso de computação, no
+caso a linguagem C e suas bibliotecas, tanto as padrões como as mais usuais.<br>
+
+
+
+<br>
+
+A engine&nbsp;funciona tanto em Windows quanto em (GNU/)Linux utilizando quase completamente o mesmo código, sendo as
+únicas diferenças:<br>
+<ul>
+  <li>
+a função de&nbsp;limpar a tela(usando a API do Windows, e usando o comando <span style="font-style: italic;">clear</span> do terminal do Linux)</li>
+</ul>
+<ul>
+  <li>
+a
+entrada do teclado(utilizando a <span style="font-style: italic;">conio</span> no Windows; ainda em construção no Linux)</li>
+</ul>
+
+
+Para ambos, o compilador utilizado foi o <span style="font-style: italic;">gcc</span>, sendo a versão 4.4.0 (mingw) no caso do Windows e 4.3.3 (Ubuntu) no caso do Linux (andLinux).<br>
+
+<br>
+
+<br>
+<span style="font-weight: bold;"></span><span style="font-weight: bold;">Organização do código:</span><br>
+<br>
+O código da engine é compilado em uma biblioteca de link
+dinâmico, uma dll no caso do Windows, e um arquivo so(shared
+object) no caso do Linux, agilizando a compilação dos
+jogos. Além disso, a biblioteca pode ser acessada por outras
+linguagens, aproveitando a agilidade proporcionada pelo código
+compilado em C.<br>
+<br>
+No atual estágio do desenvolvimento, &nbsp;os jogos estão
+localizados em pastas dentro do próprio diretório da
+engine. Isso se deve apenas ao contínuo desenvolvimento em ambas
+as partes, que ocorre paralelamente, agilizando adições na
+engine para suprir as necessidades que surgem nos jogos.<br>
+<br>
+<br>
+<span style="font-weight: bold;">Como compilar:</span><br>
+<br>
+Como dito anteriormente, o compilador utilizado foi o gcc.<br>
+<br>
+Boa parte das modernas distribuições de Linux já o
+incluem, e se não for o caso, ele pode ser instalado usando o
+sistema de pacotes da distribuição.<br>
+<br>
+No caso do Windows, deve ser instalado o pacote MinGW(Minimalist GNU
+for Windows), que consiste nos compiladores gcc/g++/etc e mais outras
+ferramentas como o make.<br>
+<br>
+Depois de instalado, é necessário adicionar a pasta que
+contém o executável do compilador na variável PATH
+do Windows, permitindo que ele seja executado de qualquer pasta. Tal
+procedimento varia de acordo com a versão do Windows.<br>
+<br>
+O código dispõe de diversos scripts que automatizam o processo de compilação:<br>
+Cada pasta de projeto contém seus próprios scripts, em suas versões para Windows e Linux, entre eles:<br>
+<ul>
+  <li><span style="font-style: italic;">compilar</span>, que compila o projeto já linkando com a engine. O executável é colocado na pasta bin.</li>
+  <li><span style="font-style: italic;">testar</span>, que executa o arquivo</li>
+  <li><span style="font-style: italic;">debugar</span>, que roda o programa no gdb, para procurar falhas de memória, entre outros bugs</li>
+  <li><span style="font-style: italic;">profile</span>, que compila o arquivo com a flag de profile, mostrando estatísticas de execução</li>
+  <li><span style="font-style: italic;">lib_compile</span>, que compila&nbsp;a engine, chamando seu próprio script</li>
+  <li><span style="font-style: italic;">sprites_copy</span>, que copia os sprites do jogo para a pasta dos binários</li>
+</ul>
+No linux, há ainda o instalar_so.sh, que copia a biblioteca para
+o sistema(embora ele possa ser usado de modo semelhante à dll;
+para isso, é necessário alterar o parametros.sh).<br>
+Além disso, existem os seguintes scripts auxiliares:<br>
+<ul>
+  <li><span style="font-style: italic;">nome</span>, que define o nome do projeto, sendo usado para acessar a pasta e nomear o aplicativo</li>
+  <li><span style="font-style: italic;">parametros</span>,
+que contem os parametros de compilação comuns a alguns scripts. É nele
+que você deve colocar as flags de compilação para utilizar alguma
+biblioteca(ex: -lm, para math.h)<br>
+</li>
+</ul>
+<br>
+Nas pastas de script da engine, existem os scripts que servem para a
+sua compilação. Entretanto, eles não precisam ser
+chamados diretamente, já que existem o lib_compile e
+instalar_so.sh nas pastas de cada projeto.<br>
+<br>
+<br>
+<span style="font-weight: bold;">Tipos de dados definidos:</span><br>
+<br style="font-style: italic;">
+<span style="font-style: italic;">//--Sprite--//<br>
+typedef struct _Sprite<br>
+{&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // "imagem" do sprite(ponteiro pra primeira linha da lista)<br>
+&nbsp;&nbsp;&nbsp; Linha *img;<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // Ponteiro pro proximo sprite da lista ligada<br>
+&nbsp;&nbsp;&nbsp; struct _sprite *prox;<br>
+} Sprite;</span><span style="font-style: italic;"></span><br>
+<br>
+O tipo central da engine, cada sprite consiste em uma struct que
+contém uma lista ligada de strings, que são cada linha da
+imagem. Devido a essa implementação, os sprites podem
+possuir variados números de linhas, cada uma com diferentes
+tamanhos:<br>
+<br>
+<span style="font-style: italic;">//--struct com cada linha da imagem--//<br>
+typedef struct _Linha<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // String da linha da imagem<br>
+&nbsp;&nbsp;&nbsp; char *str;<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // Ponteiro pra proxima linha da lista ligada<br>
+&nbsp;&nbsp;&nbsp; struct _Linha *prox;<br>
+} Linha;</span><span style="font-style: italic;"></span><br>
+<br>
+Além disso, cada sprite possui um ponteiro para um eventual
+próximo sprite, para o caso de se criar uma lista ligada de
+sprites, formando uma animação:<br>
+<br>
+<span style="font-style: italic;">//--Animacao--//<br>
+typedef struct _Anima<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Numero do sprite mostrado<br>
+&nbsp;&nbsp;&nbsp; unsigned short int n;<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // Ponteiro pro primeiro sprite da lista<br>
+&nbsp;&nbsp;&nbsp; Sprite *spr;<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // Ponteiro pra proxima animacao<br>
+&nbsp;&nbsp;&nbsp; struct _Anima *prox;<br>
+} Anima;</span><span style="font-style: italic;"></span><br>
+<br>
+Cada animação também possui um ponteiro para uma
+próxima animação, caso seja feita uma lista ligada
+delas(por exemplo, a primeira pode ser o personagem parado, a
+próxima ele andando, etc).<br>
+O código que lida com as animações ainda não foi implementado.<br>
+<br>
+<span style="font-weight: bold;">Funções disponibilizadas pela engine:</span><br>
+<ul>
+  <li>Funções de desenho, no <span style="font-style: italic;">draw.h</span>:</li>
+</ul>
+void sprite_draw(sprite, int, int);<br>
+Desenha um sprite na tela, recebendo as coordenadas x e y da tela.<br>
+Caso parte do sprite esteja fora dos limites, essa parte é enviada para o outro extremo da tela.<br>
+<br>
+void str_draw(char*, int, int);<br>
+Escreve uma string na tela.<br>
+<br>
+void str_draw_v(char*, int, int);<br>
+Escreve uma string na tela, verticalmente.<br>
+<br>
+void h_line_draw(char c, int y);<br>
+Desenha uma linha horizontal, na altura y, composta de caracteres c.<br>
+<br>
+void le_string_txt(char*, char*);<br>
+Lê uma string de um arquivo texto. O primeiro argumento é
+a string de destino, e o segundo é o caminho para o arquivo.<br>
+<br>
+void le_sprite_txt(sprite**, char*);<br>
+Lê um sprite de um arquivo texto. O segundo argumento é o caminho para o arquivo.<br>
+<br>
+void free_sprite(sprite*);<br>
+Libera um sprite alocado dinamicamente. Deve ser utilizada para liberar um sprite lido de um txt.<br>
+<br>
+<ul>
+  <li>Funções de leitura do teclado:</li>
+</ul>
+int up(void);<br>
+int down(void);<br>
+int left(void);<br>
+int right(void);<br>
+Funções que testam se as setas do teclado foram pressionadas. Retornam 0 se não.<br>
+<br>
+int esc(void);<br>
+Testa se a tecla ESC foi pressionada. No exemplo, é usada para sair do jogo.<br>
+<br>
+int espaco(void);<br>
+Testa se a barra de espaço foi pressionada. É utilizada para iniciar o jogo de pong.<br>
+<br>
+A&nbsp;adição de mais dessas funções
+é muito simples, sendo realizada conforme for necessário.<br>
+<br>
+<span style="font-weight: bold;">Variáveis Globais:</span><br>
+<br>
+<span style="font-style: italic;">// Margem<br>
+char margem_topo;<br>
+char margem_baixo;<br>
+char margem_esq;<br>
+char margem_dir;<br>
+<br>
+// Fundo da janela<br>
+char fundo;<br>
+<br>
+// fps do draw<br>
+double fps_d;<br>
+<br>
+// fps do game loop<br>
+double fps_g;<br>
+<br>
+// Tamanho da tela<br>
+int tela_x;<br>
+int tela_y;<br>
+<br>
+// Escreve as informacoes de debug na tela<br>
+int debug;</span><span style="font-style: italic;"></span><br>
+<br>
+Essas variáveis estão declaradas na engine, têm seu
+valor definido pelo código contido no arquivo vars.h de cada
+projeto, no início de sua execução.<br>
+<br>
+<br>
+<span style="font-weight: bold;">Como criar um jogo com a engine:</span><br>
+<br>
+Simples, tudo o que é necessário é copiar o
+projeto template e substituír tudo o que tiver o nome "template"
+pelo nome do seu jogo. Isso inclui a pasta, o arquivo fonte e a
+variável declarada nos scripts&nbsp;nome.(bat|sh). Depois disso,
+é só programar!<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<span style="font-weight: bold;">
+
+
+por Fernando Lucchesi Bastos Jurema(fernandolbastos@gmail.com)<br>
+Gamux - Grupo de Pesquisa e Desenvolvimento de Jogos da Unicamp</span>
+
+
+</body></html>
